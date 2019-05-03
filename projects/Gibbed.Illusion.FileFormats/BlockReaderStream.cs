@@ -418,12 +418,13 @@ namespace Gibbed.Illusion.FileFormats
                     uint remainingUncompressedSize = compressedBlockHeader.UncompressedSize;
                     for (int i = 0; i < compressedBlockHeader.ChunkCount; ++i)
                     {
+                        uint UncompressedSize = Math.Min(alignment, remainingUncompressedSize);
                         instance.AddCompressedBlock(virtualOffset,
-                                                    Math.Min(alignment, remainingUncompressedSize), //compressedBlockHeader.UncompressedSize,
+                                                    UncompressedSize, //compressedBlockHeader.UncompressedSize,
                                                     compressedPosition,
                                                     (uint) compressedBlockHeader.Chunks[i]);
                         compressedPosition += (uint) compressedBlockHeader.Chunks[i];
-                        virtualOffset += alignment;
+                        virtualOffset += UncompressedSize;
                         remainingUncompressedSize -= alignment;
                     }
                     baseStream.Seek(compressedBlockHeader.CompressedSize, SeekOrigin.Current);
@@ -432,7 +433,7 @@ namespace Gibbed.Illusion.FileFormats
                 {
                     instance.AddUncompressedBlock(virtualOffset, size, baseStream.Position);
                     baseStream.Seek(size, SeekOrigin.Current);
-                    virtualOffset += alignment;
+                    virtualOffset += size;
                 }
             }
 
